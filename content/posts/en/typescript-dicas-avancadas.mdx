@@ -1,0 +1,65 @@
+---
+title: "10 TypeScript Features That Level Up Your Code"
+description: "Advanced TypeScript features most devs overlook, but that make an enormous difference in code quality and safety."
+date: "2025-03-28"
+tags: ["TypeScript", "JavaScript", "Boas práticas"]
+category: "Tutorial"
+featured: false
+---
+
+After years writing TypeScript in production, these are the features that impact day-to-day work the most.
+
+## 1. Essential utility types
+
+```typescript
+interface User {
+  id: string
+  name: string
+  email: string
+  password: string
+}
+
+type PublicUser = Omit<User, "password">
+type UpdateUser = Partial<Pick<User, "name" | "email">>
+type ReadonlyUser = Readonly<User>
+```
+
+## 2. Template Literal Types
+
+```typescript
+type Method = "GET" | "POST" | "PUT" | "DELETE"
+type Endpoint = "/users" | "/posts"
+
+type Route = `${Method} ${Endpoint}`
+// "GET /users" | "POST /users" | "GET /posts" ...
+
+function request(route: Route) { /* TypeScript validates at compile time */ }
+request("GET /users")   // ✅
+request("PATCH /users") // ❌ Error
+```
+
+## 3. Discriminated Unions for state
+
+```typescript
+type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error }
+```
+
+## 4. The satisfies operator
+
+```typescript
+const config = {
+  theme: "dark",
+  features: ["analytics", "newsletter"],
+} satisfies Record<string, string | string[]>
+
+config.theme.toUpperCase()        // ✅ TypeScript knows it's a string
+config.features.includes("x")    // ✅ TypeScript knows it's an array
+```
+
+## Conclusion
+
+TypeScript goes far beyond adding types. These features make code more expressive and safe.

@@ -1,0 +1,68 @@
+---
+title: "10 Recursos de TypeScript que Elevam Seu Código"
+titleEn: "10 TypeScript Features That Level Up Your Code"
+description: "Recursos avançados de TypeScript que a maioria dos devs ignora, mas que fazem enorme diferença na qualidade e segurança do código."
+descriptionEn: "Advanced TypeScript features most devs overlook, but that make an enormous difference in code quality and safety."
+date: "2025-03-28"
+tags: ["TypeScript", "JavaScript", "Boas práticas"]
+category: "Tutorial"
+categoryEn: "Tutorial"
+featured: false
+---
+
+Depois de anos escrevendo TypeScript em produção, separei os recursos que mais impactam o dia a dia.
+
+## 1. Tipos utilitários essenciais
+
+```typescript
+interface User {
+  id: string
+  name: string
+  email: string
+  password: string
+}
+
+type PublicUser = Omit<User, "password">
+type UpdateUser = Partial<Pick<User, "name" | "email">>
+type ReadonlyUser = Readonly<User>
+```
+
+## 2. Template Literal Types
+
+```typescript
+type Method = "GET" | "POST" | "PUT" | "DELETE"
+type Endpoint = "/users" | "/posts"
+
+type Route = `${Method} ${Endpoint}`
+// "GET /users" | "POST /users" | "GET /posts" ...
+
+function request(route: Route) { /* TypeScript valida em compilação */ }
+request("GET /users")   // ✅
+request("PATCH /users") // ❌ Erro
+```
+
+## 3. Discriminated Unions para estados
+
+```typescript
+type AsyncState<T> =
+  | { status: "idle" }
+  | { status: "loading" }
+  | { status: "success"; data: T }
+  | { status: "error"; error: Error }
+```
+
+## 4. O operador satisfies
+
+```typescript
+const config = {
+  theme: "dark",
+  features: ["analytics", "newsletter"],
+} satisfies Record<string, string | string[]>
+
+config.theme.toUpperCase()        // ✅ TypeScript sabe que é string
+config.features.includes("x")    // ✅ TypeScript sabe que é array
+```
+
+## Conclusão
+
+TypeScript vai muito além de adicionar tipos. Esses recursos tornam o código mais expressivo e seguro.

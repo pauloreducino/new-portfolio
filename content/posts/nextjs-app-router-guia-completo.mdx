@@ -1,0 +1,69 @@
+---
+title: "Next.js App Router: O Guia que eu Gostaria de Ter Tido"
+titleEn: "Next.js App Router: The Guide I Wish I Had"
+description: "Tudo que você precisa saber sobre o App Router do Next.js 15 — de Server Components a Server Actions, na prática."
+descriptionEn: "Everything you need to know about the Next.js 15 App Router — from Server Components to Server Actions, in practice."
+date: "2025-04-15"
+tags: ["Next.js", "React", "TypeScript"]
+category: "Tutorial"
+categoryEn: "Tutorial"
+featured: true
+---
+
+O App Router mudou fundamentalmente como construímos aplicações com Next.js. Depois de meses usando em produção, aqui está tudo que aprendi.
+
+## Por que o App Router existe
+
+O Pages Router funcionava bem, mas tinha limitações sérias: todo JavaScript rodava no cliente, o data fetching era engessado, e layouts aninhados eram complicados.
+
+O App Router resolve isso com **React Server Components** como padrão.
+
+## Server Components vs Client Components
+
+```typescript
+// Server Component (padrão — zero JS enviado ao cliente)
+async function ProductList() {
+  const products = await db.products.findMany()
+  return <ul>{products.map(p => <li key={p.id}>{p.name}</li>)}</ul>
+}
+
+// Client Component — use só quando precisar de estado/eventos
+"use client"
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+}
+```
+
+**Regra prática:** tudo que não precisa de interatividade vira Server Component.
+
+## Data Fetching simplificado
+
+Chega de `getServerSideProps`. No App Router você faz fetch direto no componente:
+
+```typescript
+async function Page() {
+  const data = await fetch("https://api.exemplo.com/dados", {
+    next: { revalidate: 3600 }, // ISR — revalida a cada 1h
+  })
+  const json = await data.json()
+  return <div>{json.title}</div>
+}
+```
+
+## Server Actions
+
+Funções que rodam no servidor, chamadas pelo cliente. Acabou com 90% das rotas de API simples:
+
+```typescript
+"use server"
+export async function createPost(formData: FormData) {
+  const title = formData.get("title") as string
+  await db.posts.create({ data: { title } })
+  revalidatePath("/posts")
+}
+```
+
+## Conclusão
+
+O App Router é um salto real de produtividade. Vale cada hora de estudo.

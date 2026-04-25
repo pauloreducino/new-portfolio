@@ -1,0 +1,66 @@
+---
+title: "Next.js App Router: The Guide I Wish I Had"
+description: "Everything you need to know about the Next.js 15 App Router — from Server Components to Server Actions, in practice."
+date: "2025-04-15"
+tags: ["Next.js", "React", "TypeScript"]
+category: "Tutorial"
+featured: true
+---
+
+The App Router fundamentally changed how we build applications with Next.js. After months using it in production, here's everything I learned.
+
+## Why the App Router exists
+
+The Pages Router worked well, but had serious limitations: all JavaScript ran on the client, data fetching was rigid, and nested layouts were complicated.
+
+The App Router solves this with **React Server Components** as the default.
+
+## Server Components vs Client Components
+
+```typescript
+// Server Component (default — zero JS sent to the client)
+async function ProductList() {
+  const products = await db.products.findMany()
+  return <ul>{products.map(p => <li key={p.id}>{p.name}</li>)}</ul>
+}
+
+// Client Component — use only when you need state/events
+"use client"
+function Counter() {
+  const [count, setCount] = useState(0)
+  return <button onClick={() => setCount(c => c + 1)}>{count}</button>
+}
+```
+
+**Practical rule:** anything that doesn't need interactivity becomes a Server Component.
+
+## Simplified data fetching
+
+No more `getServerSideProps`. In the App Router you fetch directly in the component:
+
+```typescript
+async function Page() {
+  const data = await fetch("https://api.example.com/data", {
+    next: { revalidate: 3600 }, // ISR — revalidates every 1h
+  })
+  const json = await data.json()
+  return <div>{json.title}</div>
+}
+```
+
+## Server Actions
+
+Functions that run on the server, called by the client. Eliminated 90% of simple API routes:
+
+```typescript
+"use server"
+export async function createPost(formData: FormData) {
+  const title = formData.get("title") as string
+  await db.posts.create({ data: { title } })
+  revalidatePath("/posts")
+}
+```
+
+## Conclusion
+
+The App Router is a real productivity leap. Every hour of study is worth it.
